@@ -38,3 +38,28 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v1
+        with:
+          kustomize-version: 3.6.1
+
+      - name: Update Kubernetes resources
+        env:
+          DOCKERHUB_USERNAME: ${{ env.DOCKERHUB_USERNAME }}
+          DOCKER_IMAGE_VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          cd k8s
+          kustomize edit set image fc-gitops=$DOCKERHUB_USERNAME/fc-gitops:$DOCKER_IMAGE_VERSION
+
+      - name: Git Commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "chore: bump docker version"
+
+      - name: Git Push
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repository: dalloglio/fc-gitops
