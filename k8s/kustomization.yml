@@ -8,4 +8,4 @@ resources:
 images:
 - name: fc-gitops
   newName: dalloglio/fc-gitops
-  newTag: develop-2f8f88d
+  newTag: main-6c96747
